@@ -60,26 +60,26 @@ class HomeScreen extends StatelessWidget {
 
   List<Widget> _modules(BuildContext context) {
     final items = [
-      _Module('Pedidos', Icons.assignment, () =>
-          Navigator.pushNamed(context, '/pedidos')),
-      _Module('Cursos', Icons.school, () =>
-          Navigator.pushNamed(context, '/cursos')),
-      _Module('Trabalhe Conosco', Icons.work, () =>
-          Navigator.pushNamed(context, '/trabalhe')),
-      _Module('Arquivos', Icons.folder_open, () =>
-          Navigator.pushNamed(context, '/arquivos')),
-      _Module('Comunicados', Icons.campaign, () =>
-          Navigator.pushNamed(context, '/comunicados')),
-      _Module('Fale Conosco', Icons.chat, () =>
-          Navigator.pushNamed(context, '/fale')),
-      _Module('Boletos', Icons.receipt_long, () =>
+      _Module('Boletos', '2ª via e pagamentos', Icons.receipt_long, () =>
           Navigator.pushNamed(context, '/boletos')),
-      _Module('Guia', Icons.store, () =>
-          Navigator.pushNamed(context, '/guia')),
-      _Module('Correspondência', Icons.mail, () =>
+      _Module('Comunicados', 'Avisos do shopping', Icons.campaign, () =>
+          Navigator.pushNamed(context, '/comunicados')),
+      _Module('Correspondência', 'Retirada e devolução', Icons.mail, () =>
           Navigator.pushNamed(context, '/correspondencia')),
-      _Module('Configurações', Icons.settings, () =>
+      _Module('Arquivos', 'Arquivos e manuais', Icons.folder_open, () =>
+          Navigator.pushNamed(context, '/arquivos')),
+      _Module('Fale Conosco', 'Chamados e dúvidas', Icons.chat, () =>
+          Navigator.pushNamed(context, '/fale')),
+      _Module('Palestras e Cursos', 'Inscrições e eventos', Icons.school, () =>
+          Navigator.pushNamed(context, '/cursos')),
+      _Module('Pedidos', 'Acompanhar e executar', Icons.assignment, () =>
+          Navigator.pushNamed(context, '/pedidos')),
+      _Module('Trabalhe Conosco', 'Vagas e cadastros', Icons.work, () =>
+          Navigator.pushNamed(context, '/trabalhe')),
+      _Module('Configurações', 'Perfil e senha', Icons.settings, () =>
           Navigator.pushNamed(context, '/configuracoes')),
+      _Module('Vitrine', 'Produtos da loja', Icons.store, () =>
+          Navigator.pushNamed(context, '/guia')),
     ];
     return items
         .map((m) => _card(m, context))
@@ -95,6 +95,7 @@ class HomeScreen extends StatelessWidget {
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(12),
         ),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -105,6 +106,12 @@ class HomeScreen extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
+            const SizedBox(height: 4),
+            Text(
+              m.descricao,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
           ],
         ),
       ),
@@ -114,7 +121,8 @@ class HomeScreen extends StatelessWidget {
 
 class _Module {
   final String label;
+  final String descricao;
   final IconData icon;
   final VoidCallback onTap;
-  _Module(this.label, this.icon, this.onTap);
+  _Module(this.label, this.descricao, this.icon, this.onTap);
 }

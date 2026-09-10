@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Comunicado {
   final int id;
   final String pessoa;
@@ -24,6 +26,75 @@ class Comunicado {
           data: (o['data'] ?? '').toString(),
         );
       }).toList();
+}
+
+class ComunicadoAnexo {
+  final String id;
+  final String nome;
+  final String tipo;
+  final String url;
+  ComunicadoAnexo({
+    required this.id,
+    required this.nome,
+    required this.tipo,
+    required this.url,
+  });
+
+  static String _url(String id) {
+    final v = id.trim().replaceAll('"', '');
+    if (v.startsWith('http')) return v;
+    return 'https://upload-r2.madnezz.com.br/$v';
+  }
+
+  static List<ComunicadoAnexo> parse(dynamic anexo, String tipo) {
+    if (anexo == null) return [];
+    if (anexo is List) {
+      return anexo.map((e) {
+        final o = e is Map ? e : <String, dynamic>{};
+        final id = (o['id'] ?? '').toString();
+        return ComunicadoAnexo(
+          id: id,
+          nome: (o['name'] ?? 'Arquivo').toString(),
+          tipo: (o['type'] ?? tipo).toString(),
+          url: _url(id),
+        );
+      }).toList();
+    }
+    final s = anexo.toString().trim();
+    if (s.isEmpty || s == 'null') return [];
+    try {
+      final decoded = s.startsWith('[')
+          ? (const JsonDecoder().convert(s) as List)
+          : null;
+      if (decoded != null) return parse(decoded, tipo);
+    } catch (_) {}
+    return [
+      ComunicadoAnexo(id: s, nome: 'Anexo', tipo: tipo, url: _url(s))
+    ];
+  }
+}
+
+class ComunicadoDetalhe {
+  final String nome;
+  final String texto;
+  final String tipo;
+  final List<ComunicadoAnexo> anexos;
+  ComunicadoDetalhe({
+    required this.nome,
+    required this.texto,
+    required this.tipo,
+    required this.anexos,
+  });
+
+  factory ComunicadoDetalhe.parse(Map<String, dynamic> o) {
+    final tipo = (o['tipo'] ?? '').toString();
+    return ComunicadoDetalhe(
+      nome: (o['nome'] ?? '').toString(),
+      texto: (o['texto'] ?? '').toString(),
+      tipo: tipo,
+      anexos: ComunicadoAnexo.parse(o['anexo'], tipo),
+    );
+  }
 }
 
 class Documento {

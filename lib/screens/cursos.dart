@@ -51,6 +51,21 @@ extension _S on String {
   }
 }
 
+Widget _info(String rotulo, String valor) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(rotulo,
+          style: const TextStyle(fontSize: 12, color: Colors.grey)),
+      const SizedBox(height: 2),
+      Text(valor,
+          style:
+              const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+    ],
+  );
+}
+
 class CursosScreen extends StatefulWidget {
   const CursosScreen({super.key});
 
@@ -114,13 +129,26 @@ class _CursosScreenState extends State<CursosScreen> {
                 title: Text(c.titulo),
                 subtitle: c.vagas.isNotEmpty ? Text('Vagas: ${c.vagas}') : null,
                 trailing: Chip(label: Text(c.data)),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => WebViewScreen(
-                      title: c.titulo,
-                      path: '/systems/curso/?curso_id=${c.id}&integrated=true',
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: Text(c.titulo),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _info('Data', c.data),
+                        const SizedBox(height: 8),
+                        _info('Vagas',
+                            c.vagas.isNotEmpty ? c.vagas : '-'),
+                      ],
                     ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('Fechar'),
+                      ),
+                    ],
                   ),
                 ),
               );

@@ -13,6 +13,18 @@ class ComunicadoRepo {
         '/systems/comunicado/api/confirmar.php',
         fields: {'id': id.toString(), 'integrated': 'true'},
       );
+
+  static Future<ComunicadoDetalhe> detalhe(int id) async {
+    final raw = await Api.get(
+      '/systems/comunicado/api/modal.php',
+      {'id': id.toString()},
+    );
+    final decoded = jsonDecode(raw);
+    final obj = decoded is List && decoded.isNotEmpty
+        ? decoded.first as Map<String, dynamic>
+        : decoded as Map<String, dynamic>;
+    return ComunicadoDetalhe.parse(obj);
+  }
 }
 
 class ArquivosRepo {
@@ -52,6 +64,15 @@ class FaleConoscoRepo {
         '/systems/fale-conosco/api/lista_ajax.php?do=finalizar',
         fields: {'id': id.toString(), 'integrated': 'true'},
       );
+
+  static Future<void> responder(int id, String mensagem) => Api.post(
+        '/systems/fale-conosco/api/lista_ajax.php?do=responder',
+        fields: {
+          'id': id.toString(),
+          'mensagem': mensagem,
+          'integrated': 'true',
+        },
+      );
 }
 
 class BoletosRepo {
@@ -86,19 +107,38 @@ class GuiaRepo {
     );
     return ProdutoVitrine.parseArray(jsonDecode(raw) as List<dynamic>);
   }
+
+  static Future<void> definirStatus(int id, String status) => Api.post(
+        '/systems/guia/api/guia.php?do=status',
+        fields: {
+          'id': id.toString(),
+          'status': status,
+          'integrated': 'true',
+        },
+      );
+
+  static Future<void> excluir(int id) => Api.post(
+        '/systems/guia/api/guia.php?do=status',
+        fields: {
+          'id': id.toString(),
+          'status': 'excluido',
+          'integrated': 'true',
+        },
+      );
 }
 
 class CorrespondenciaRepo {
   static Future<void> _seed() =>
       Api.get('/systems/correspondencia/?integrated=true');
 
-  static Future<List<Correspondencia>> listar() async {
+  static Future<List<Correspondencia>> listar(
+      [String status = '0']) async {
     await _seed();
     final raw = await Api.get(
       '/systems/correspondencia/api/lista.php?do=get',
       {
         'page': '0',
-        'filtro_status': '0',
+        'filtro_status': status,
         'filtro_loja': '',
         'filtro_codigo': '',
         'filtro_categoria': '',
