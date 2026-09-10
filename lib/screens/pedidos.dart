@@ -14,6 +14,17 @@ class PedidosScreen extends StatefulWidget {
 
 class _PedidosScreenState extends State<PedidosScreen> {
   late Future<List<PedidoColuna>> _future;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _menuAberto = false;
+  String? _filtroStatus;
+
+  static const _filtros = [
+    ['novo', 'Novo', Icons.description_outlined],
+    ['andamento', 'Em andamento', Icons.list_alt],
+    ['aprovado', 'Aprovados', Icons.check],
+    ['reprovado', 'Reprovados', Icons.close],
+    ['cancelado', 'Cancelados', Icons.block],
+  ];
 
   @override
   void initState() {
@@ -27,9 +38,39 @@ class _PedidosScreenState extends State<PedidosScreen> {
     });
   }
 
+  Future<void> _novoPedido() async {
+    await Navigator.pushNamed(context, '/pedidos/novo');
+    _refresh();
+  }
+
+  void _alternarMenu() {
+    if (_menuAberto) {
+      Navigator.pop(context);
+    } else {
+      _scaffoldKey.currentState?.openDrawer();
+    }
+  }
+
+  List<PedidoColuna> _colunasFiltradas(List<PedidoColuna> cols) {
+    if (_filtroStatus == null) return cols;
+    final chave = _filtroStatus!;
+    return [
+      for (final col in cols)
+        PedidoColuna(
+          col.nome,
+          col.cards
+              .where((c) =>
+                  c.status.toLowerCase().contains(chave))
+              .toList(),
+        ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: const Color(0xFFF2F5F8),
       appBar: AppBar(
         title: const Text('Pedidos'),
         actions: [
@@ -38,16 +79,45 @@ class _PedidosScreenState extends State<PedidosScreen> {
             tooltip: 'Atualizar',
             onPressed: _refresh,
           ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            tooltip: 'Novo pedido',
-            onPressed: () async {
-              await Navigator.pushNamed(context, '/pedidos/novo');
-              _refresh();
-            },
-          ),
         ],
       ),
+      drawer: Drawer(
+        backgroundColor: const Color(0xFF00A091),
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.only(top: 20),
+            children: [
+              for (final f in _filtros)
+                ListTile(
+                  leading: Icon(f[2] as IconData, color: Colors.white),
+                  title: Text(f[1] as String,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500)),
+                  selected: _filtroStatus == f[0],
+                  selectedTileColor: Colors.white.withOpacity(0.15),
+                  onTap: () {
+                    setState(() => _filtroStatus =
+                        _filtroStatus == f[0] ? null : f[0] as String);
+                    Navigator.pop(context);
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+      onDrawerChanged: (aberto) =>
+          setState(() => _menuAberto = aberto),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _alternarMenu,
+        backgroundColor: const Color(0xFF00A091),
+        foregroundColor: Colors.white,
+        child: Icon(
+            _menuAberto ? Icons.chevron_left : Icons.chevron_right),
+      ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.startFloat,
       body: FutureBuilder<List<PedidoColuna>>(
         future: _future,
         builder: (context, snap) {
@@ -69,39 +139,75 @@ class _PedidosScreenState extends State<PedidosScreen> {
               ),
             );
           }
-          final cols = snap.data ?? [];
-          final vazias = cols.every((c) => c.cards.isEmpty);
-          if (cols.isEmpty || vazias) {
-            return const Center(child: Text('Nenhum pedido encontrado'));
-          }
-          return ListView.separated(
-            padding: const EdgeInsets.all(12),
-            itemCount: cols.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
-            itemBuilder: (_, i) {
-              final col = cols[i];
-              if (col.cards.isEmpty) return const SizedBox.shrink();
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          final cols = _colunasFiltradas(snap.data ?? []);
+          final total =
+              cols.fold<int>(0, (s, c) => s + c.cards.length);
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 90),
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    col.nome,
+                    total == 0 ? 'Nenhum Pedido' : 'Pedidos',
                     style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                      fontSize: 22,
+                      color: Color(0xFF555555),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const Icon(Icons.list_alt,
+                      size: 20, color: Color(0xFF666666)),
+                ],
+              ),
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: _novoPedido,
+                child: Container(
+                  height: 130,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDCDCDC),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.add,
+                            size: 32, color: Color(0xFF88929A)),
+                        SizedBox(width: 8),
+                        Text('Pedido',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF88929A),
+                            )),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              for (final col in cols)
+                if (col.cards.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8, bottom: 8),
+                    child: Text(
+                      col.nome,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
                   ...col.cards.map((c) => _PedidoCardItem(
                         card: c,
                         onChanged: _refresh,
                       )),
                 ],
+            ],
           );
         },
-      );
-    },
-    ),
+      ),
     );
   }
 }

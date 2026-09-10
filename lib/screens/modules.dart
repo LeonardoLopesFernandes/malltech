@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:html/parser.dart' as html_parser;
 import 'package:malltech_flutter/core/api.dart';
 import 'package:malltech_flutter/core/session.dart';
 import 'package:malltech_flutter/core/repos.dart' show ComunicadoRepo,
@@ -10,8 +10,38 @@ import 'package:malltech_flutter/widgets/web_view_screen.dart';
 import 'package:malltech_flutter/widgets/pdf_viewer_screen.dart';
 import 'package:malltech_flutter/screens/correspondencia_detalhe.dart';
 
-class ComunicadosScreen extends StatelessWidget {
+String _textoLimpo(String html) {
+  String texto;
+  try {
+    texto = html_parser.parse(html).body?.text ?? html;
+  } catch (_) {
+    texto = html.replaceAll(RegExp(r'<[^>]*>'), '');
+  }
+  final linhas = texto.split('\n').map((l) => l.trim()).where((l) {
+    if (l.isEmpty) return false;
+    // Descarta linhas só com números/pontuação (ex: "17:3", "26.", "09:4")
+    if (RegExp(r'^[\d\s.:,;/\-]+$').hasMatch(l)) return false;
+    return true;
+  }).toList();
+  var junto = linhas.join('\n');
+  // Remove marcadores inline tipo "17:3" (minuto de 1 dígito = sujeira, não horário)
+  junto = junto.replaceAll(RegExp(r'\b\d+:\d\b'), '');
+  junto = junto.replaceAll(RegExp(r'[ \t]{2,}'), ' ');
+  junto = junto.replaceAll(RegExp(r'\n{3,}'), '\n\n').trim();
+  return junto.isEmpty
+      ? html.replaceAll(RegExp(r'<[^>]*>'), '')
+      : junto;
+}
+
+class ComunicadosScreen extends StatefulWidget {
   const ComunicadosScreen({super.key});
+
+  @override
+  State<ComunicadosScreen> createState() => _ComunicadosScreenState();
+}
+
+class _ComunicadosScreenState extends State<ComunicadosScreen> {
+  final _lidos = <int>{};
 
   Future<void> _abrirDetalhe(BuildContext context, Comunicado c) async {
     showDialog(
@@ -32,7 +62,7 @@ class ComunicadosScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(d.texto),
+                Text(_textoLimpo(d.texto)),
                 if (d.anexos.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   const Text('Anexos:',
@@ -42,26 +72,16 @@ class ComunicadosScreen extends StatelessWidget {
                         contentPadding: EdgeInsets.zero,
                         leading: const Icon(Icons.attach_file),
                         title: Text(a.nome),
-                        onTap: () async {
-                          try {
-                            final ok = await launchUrl(
-                              Uri.parse(a.url),
-                              mode: LaunchMode.externalApplication,
-                            );
-                            if (!ok && ctx.mounted) {
-                              ScaffoldMessenger.of(ctx).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        'Não foi possível abrir o anexo')),
-                              );
-                            }
-                          } catch (e) {
-                            if (ctx.mounted) {
-                              ScaffoldMessenger.of(ctx).showSnackBar(
-                                SnackBar(content: Text('Erro: $e')),
-                              );
-                            }
-                          }
+                        onTap: () {
+                          Navigator.push(
+                            ctx,
+                            MaterialPageRoute(
+                              builder: (_) => PdfViewerScreen(
+                                title: a.nome,
+                                url: a.url,
+                              ),
+                            ),
+                          );
                         },
                       )),
                 ],
@@ -78,6 +98,7 @@ class ComunicadosScreen extends StatelessWidget {
                 try {
                   await ComunicadoRepo.confirmar(c.id);
                   if (ctx.mounted) {
+                    setState(() => _lidos.add(c.id));
                     Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -113,31 +134,37 @@ class ComunicadosScreen extends StatelessWidget {
       emptyText: 'Nenhum comunicado.',
       itemBuilder: (ctx, item, _) {
         final c = item as Comunicado;
+        final lido = _lidos.contains(c.id);
         return ListTile(
           title: Text(c.nome.isNotEmpty ? c.nome : c.pessoa),
           subtitle: Text(
             [c.empreendimento, c.data].where((e) => e.isNotEmpty).join(' • '),
           ),
-          trailing: IconButton(
-            icon: const Icon(Icons.check_circle_outline),
-            tooltip: 'Confirmar',
-            onPressed: () async {
-              try {
-                await ComunicadoRepo.confirmar(c.id);
-                if (ctx.mounted) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(
-                    const SnackBar(content: Text('Comunicado confirmado')),
-                  );
-                }
-              } catch (e) {
-                if (ctx.mounted) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(
-                    SnackBar(content: Text('Erro: $e')),
-                  );
-                }
-              }
-            },
-          ),
+          trailing: lido
+              ? const Icon(Icons.check_circle,
+                  color: Colors.green, size: 28)
+              : IconButton(
+                  icon: const Icon(Icons.check_circle_outline),
+                  tooltip: 'Confirmar',
+                  onPressed: () async {
+                    try {
+                      await ComunicadoRepo.confirmar(c.id);
+                      if (ctx.mounted) {
+                        setState(() => _lidos.add(c.id));
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                              content: Text('Comunicado confirmado')),
+                        );
+                      }
+                    } catch (e) {
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(content: Text('Erro: $e')),
+                        );
+                      }
+                    }
+                  },
+                ),
           onTap: () => _abrirDetalhe(ctx, c),
         );
       },
@@ -261,7 +288,7 @@ class _FaleConoscoScreenState extends State<FaleConoscoScreen> {
                 _linha('Tipo', f.tipo),
                 _linha('Loja', f.empreendimento),
                 _linha('Data', f.cad),
-                _linha('Mensagem', f.mensagem),
+                _linha('Mensagem', _textoLimpo(f.mensagem)),
                 _linha('Situação', f.statusLabel),
                 if (f.finalizado < 1) ...[
                   const SizedBox(height: 8),
