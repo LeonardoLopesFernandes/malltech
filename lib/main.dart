@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:malltech_flutter/core/api.dart';
 import 'package:malltech_flutter/core/session.dart';
+import 'package:malltech_flutter/core/tema.dart';
 import 'package:malltech_flutter/screens/login.dart';
 import 'package:malltech_flutter/screens/home.dart';
 import 'package:malltech_flutter/screens/trabalhe_conosco.dart';
@@ -13,7 +15,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Api.init();
   await Session.init();
-  runApp(const MalltechApp());
+  final tema = await TemaApp.carregar();
+  runApp(
+    ChangeNotifierProvider.value(
+      value: tema,
+      child: const MalltechApp(),
+    ),
+  );
 }
 
 class MalltechApp extends StatelessWidget {
@@ -21,14 +29,11 @@ class MalltechApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Malltech',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: const Color(0xFFFF2D55),
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFF2D55)),
-        useMaterial3: true,
-      ),
+    return Consumer<TemaApp>(
+      builder: (_, tema, __) => MaterialApp(
+        title: 'Malltech',
+        debugShowCheckedModeBanner: false,
+        theme: tema.theme,
       initialRoute: '/',
       routes: {
         '/': (c) => const AuthGate(),
@@ -43,7 +48,8 @@ class MalltechApp extends StatelessWidget {
         '/guia': (c) => const GuiaScreen(),
         '/correspondencia': (c) => const CorrespondenciaScreen(),
         '/configuracoes': (c) => const ConfiguracoesScreen(),
-      },
+        },
+      ),
     );
   }
 }

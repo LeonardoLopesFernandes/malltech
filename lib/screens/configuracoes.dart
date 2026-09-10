@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:malltech_flutter/core/repos.dart';
 import 'package:malltech_flutter/core/session.dart';
+import 'package:malltech_flutter/core/tema.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ConfiguracoesScreen extends StatefulWidget {
@@ -111,11 +113,60 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   @override
   Widget build(BuildContext context) {
     final user = Session.usuario.value;
+    final tema = context.watch<TemaApp>();
     return Scaffold(
       appBar: AppBar(title: const Text('Configurações')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          _titulo('Aparência'),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (int i = 0; i < TemaApp.opcoes.length; i++)
+                GestureDetector(
+                  onTap: () => tema.definirCor(i),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: TemaApp.opcoes[i]['cor'] as Color,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: tema.indice == i
+                                ? Theme.of(context).primaryColor
+                                : Colors.grey.shade300,
+                            width: tema.indice == i ? 3 : 1,
+                          ),
+                        ),
+                        child: tema.indice == i
+                            ? const Icon(Icons.check,
+                                color: Colors.white)
+                            : null,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        TemaApp.opcoes[i]['nome'] as String,
+                        style: const TextStyle(fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Modo escuro'),
+            secondary: const Icon(Icons.dark_mode),
+            value: tema.escuro,
+            onChanged: (v) => tema.definirEscuro(v),
+          ),
+          const SizedBox(height: 12),
           _titulo('Foto de perfil'),
           const SizedBox(height: 8),
           Row(

@@ -40,6 +40,7 @@ dependencies:
   pdfx: ^2.6.0
   image_picker: ^1.2.3
   url_launcher: ^6.3.2
+  provider: ^6.1.5+1
 
 dev_dependencies:
   flutter_test:
