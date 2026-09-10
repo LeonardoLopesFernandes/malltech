@@ -117,13 +117,19 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Image.asset(
+                'assets/logo_malltech.png',
+                width: 96,
+                height: 96,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 8),
               const Text(
                 'Malltech',
                 style: TextStyle(
@@ -133,20 +139,31 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Acesso ao Malltech',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 'Informe suas credenciais para continuar',
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 14),
               ),
               const SizedBox(height: 28),
               TextField(
                 controller: _user,
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 16),
                 decoration: InputDecoration(
                   labelText: 'Usuário',
+                  labelStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -162,8 +179,13 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: _pass,
                 obscureText: _obscure,
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 16),
                 decoration: InputDecoration(
                   labelText: 'Senha',
+                  labelStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -174,6 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscure ? Icons.visibility : Icons.visibility_off,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
@@ -194,7 +217,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
-                  child: const Text('Esqueci minha senha.'),
+                  child: const Text(
+                    'Esqueci minha senha.',
+                    style: TextStyle(
+                      color: Color(0xFFFF2D55),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
@@ -207,7 +236,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         : (v) => setState(() => _lembrar = v ?? false),
                     activeColor: const Color(0xFFFF2D55),
                   ),
-                  const Text('Lembrar senha'),
+                  Text(
+                    'Lembrar senha',
+                    style: TextStyle(
+                        color:
+                            Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.w500),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),

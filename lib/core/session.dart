@@ -122,8 +122,14 @@ class Session {
 
   static void _clearKeepLogin() {
     final ultimo = ultimoLogin();
+    final senha = ultimaSenha();
+    final lembrar = deveSalvarSenha();
     _prefs?.clear();
     if (ultimo.isNotEmpty) _prefs?.setString('ultimo_login', ultimo);
+    if (lembrar) {
+      if (senha.isNotEmpty) _prefs?.setString('ultima_senha', senha);
+      _prefs?.setBool('lembrar_senha', true);
+    }
   }
 
   static bool isTokenExpirado([String? tk]) {
