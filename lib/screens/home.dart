@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:malltech_flutter/core/session.dart';
 
+String _nomeExibicao(String nome) {
+  var limpo = nome.split('@').first;
+  limpo = limpo.replaceAll(RegExp(r'[^A-Za-zÀ-ÿ\s]'), ' ');
+  limpo = limpo.replaceAll(RegExp(r'\s+'), ' ').trim();
+  return limpo.isEmpty ? nome : limpo;
+}
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -38,7 +45,29 @@ class HomeScreen extends StatelessWidget {
       },
       child: Scaffold(
       appBar: AppBar(
-        title: const Text('Malltech'),
+        title: ValueListenableBuilder(
+          valueListenable: Session.usuario,
+          builder: (_, user, __) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _nomeExibicao(user?.nome ?? ''),
+                style: const TextStyle(
+                    fontSize: 17, fontWeight: FontWeight.bold),
+              ),
+              if ((user?.lojaNome ?? '').isNotEmpty)
+                Text(
+                  user!.lojaNome,
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant),
+                ),
+            ],
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
