@@ -1,0 +1,225 @@
+import 'package:flutter/material.dart';
+import 'package:malltech_flutter/core/repos.dart';
+import 'package:malltech_flutter/core/session.dart';
+import 'package:image_picker/image_picker.dart';
+
+class ConfiguracoesScreen extends StatefulWidget {
+  const ConfiguracoesScreen({super.key});
+
+  @override
+  State<ConfiguracoesScreen> createState() => _ConfiguracoesScreenState();
+}
+
+class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
+  final _novaSenha = TextEditingController();
+  final _repeteSenha = TextEditingController();
+  bool _salvandoSenha = false;
+  bool _enviandoFoto = false;
+
+  @override
+  void dispose() {
+    _novaSenha.dispose();
+    _repeteSenha.dispose();
+    super.dispose();
+  }
+
+  void _toast(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  Future<void> _trocarFoto() async {
+    try {
+      final img = await ImagePicker()
+          .pickImage(source: ImageSource.gallery, imageQuality: 85);
+      if (img == null) return;
+      setState(() => _enviandoFoto = true);
+      final bytes = await img.readAsBytes();
+      final nome =
+          'perfil_${DateTime.now().millisecondsSinceEpoch}.png';
+      final url = await ConfigRepo.uploadFoto(bytes, nome);
+      await ConfigRepo.definirImagem(url);
+      _toast('Foto atualizada');
+    } catch (e) {
+      _toast('Falha ao atualizar foto: $e');
+    } finally {
+      if (mounted) setState(() => _enviandoFoto = false);
+    }
+  }
+
+  Future<void> _removerFoto() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Remover foto de perfil?'),
+        content: const Text('A foto será removida do seu perfil.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Remover'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      await ConfigRepo.removerImagem();
+      _toast('Foto removida');
+    } catch (e) {
+      _toast('Falha ao remover foto: $e');
+    }
+  }
+
+  Future<void> _atualizarSenha() async {
+    final nova = _novaSenha.text;
+    final repete = _repeteSenha.text;
+    if (nova.isEmpty || repete.isEmpty) {
+      _toast('Preencha a nova senha nos dois campos.');
+      return;
+    }
+    if (nova != repete) {
+      _toast('As senhas não coincidem.');
+      return;
+    }
+    setState(() => _salvandoSenha = true);
+    try {
+      await ConfigRepo.trocarSenha(nova, repete);
+      _novaSenha.clear();
+      _repeteSenha.clear();
+      _toast('Senha atualizada com sucesso');
+    } catch (e) {
+      _toast('Falha ao atualizar senha: $e');
+    } finally {
+      if (mounted) setState(() => _salvandoSenha = false);
+    }
+  }
+
+  Future<void> _adiar() async {
+    try {
+      await ConfigRepo.adiarSenha();
+      _toast('Adiado. Você será lembrado depois.');
+    } catch (e) {
+      _toast('Falha ao adiar: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = Session.usuario.value;
+    return Scaffold(
+      appBar: AppBar(title: const Text('Configurações')),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _titulo('Foto de perfil'),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 32,
+                backgroundImage: user?.imagem.isNotEmpty == true
+                    ? NetworkImage(user!.imagem)
+                    : null,
+                child: user?.imagem.isNotEmpty == true
+                    ? null
+                    : const Icon(Icons.person, size: 32),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(user?.nome ?? '',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(user?.imagem.isNotEmpty == true
+                        ? 'Foto definida'
+                        : 'Nenhuma foto'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _enviandoFoto ? null : _trocarFoto,
+                  icon: const Icon(Icons.photo_library),
+                  label: Text(
+                      _enviandoFoto ? 'Enviando...' : 'Alterar foto'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _removerFoto,
+                  icon: const Icon(Icons.delete_outline),
+                  label: const Text('Remover'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _titulo('Senha'),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _novaSenha,
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Nova senha',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: _repeteSenha,
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Repita a senha',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _salvandoSenha ? null : _atualizarSenha,
+                  child: Text(_salvandoSenha
+                      ? 'Atualizando...'
+                      : 'Atualizar senha'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _adiar,
+                  child: const Text('Adiar atualização'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _titulo(String texto) {
+    return Text(
+      texto.toUpperCase(),
+      style: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+        letterSpacing: 1.2,
+        color: Theme.of(context).primaryColor,
+      ),
+    );
+  }
+}
