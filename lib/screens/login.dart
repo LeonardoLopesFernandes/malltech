@@ -125,18 +125,8 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Image.asset(
                 'assets/logo_malltech.png',
-                width: 96,
-                height: 96,
+                width: 200,
                 fit: BoxFit.contain,
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Malltech',
-                style: TextStyle(
-                  fontSize: 34,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFFF2D55),
-                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -169,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Color(0xFFFF2D55)),
+                    borderSide: BorderSide(color: Theme.of(context).primaryColor),
                   ),
                 ),
                 enabled: !_loading,
@@ -191,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Color(0xFFFF2D55)),
+                    borderSide: BorderSide(color: Theme.of(context).primaryColor),
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -217,10 +207,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
-                  child: const Text(
+                  child: Text(
                     'Esqueci minha senha.',
                     style: TextStyle(
-                      color: Color(0xFFFF2D55),
+                      color: Theme.of(context).primaryColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -234,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onChanged: _loading
                         ? null
                         : (v) => setState(() => _lembrar = v ?? false),
-                    activeColor: const Color(0xFFFF2D55),
+                    activeColor: Theme.of(context).primaryColor,
                   ),
                   Text(
                     'Lembrar senha',
@@ -261,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: ElevatedButton(
                   onPressed: _loading ? null : _submit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF2D55),
+                    backgroundColor: Theme.of(context).primaryColor,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

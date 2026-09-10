@@ -186,7 +186,9 @@ class ArquivosScreen extends StatelessWidget {
         return ListTile(
           leading: Icon(
             d.foiLido ? Icons.description : Icons.mark_as_unread,
-            color: d.foiLido ? Colors.grey : const Color(0xFFFF2D55),
+            color: d.foiLido
+                ? Colors.grey
+                : Theme.of(ctx).primaryColor,
           ),
           title: Text(d.titulo),
           subtitle: Text(

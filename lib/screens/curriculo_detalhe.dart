@@ -140,7 +140,7 @@ class CurriculoDetalhePage extends StatelessWidget {
                 icon: const Icon(Icons.picture_as_pdf),
                 label: const Text('Visualizar CV'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF2D55),
+                  backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),

@@ -128,7 +128,8 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(m.icon, size: 40, color: const Color(0xFFFF2D55)),
+            Icon(m.icon,
+                size: 40, color: Theme.of(context).primaryColor),
             const SizedBox(height: 10),
             Text(
               m.label,

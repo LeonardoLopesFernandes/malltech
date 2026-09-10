@@ -1046,7 +1046,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
           height: 52,
           child: ElevatedButton(
             onPressed: _enviando ? null : _enviar,
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2D55), foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).primaryColor, foregroundColor: Colors.white),
             child: _enviando
                 ? const CircularProgressIndicator(color: Colors.white)
                 : const Text('Enviar pedido', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -1086,8 +1086,8 @@ class _Campo extends StatelessWidget {
           decoration: InputDecoration(
             labelText: label,
             border: const OutlineInputBorder(),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFFFF2D55)),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).primaryColor),
             ),
           ),
         ),

@@ -112,7 +112,7 @@ class _TrabalheConoscoScreenState extends State<TrabalheConoscoScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: _novaVaga,
-          backgroundColor: const Color(0xFFFF2D55),
+          backgroundColor: Theme.of(context).primaryColor,
           child: const Icon(Icons.add),
         ),
         body: TabBarView(
@@ -208,7 +208,9 @@ class _TrabalheConoscoScreenState extends State<TrabalheConoscoScreen> {
               return ListTile(
                 leading: Icon(
                   c.lido ? Icons.visibility : Icons.visibility_off,
-                  color: c.lido ? Colors.grey : const Color(0xFFFF2D55),
+                  color: c.lido
+                      ? Colors.grey
+                      : Theme.of(ctx).primaryColor,
                 ),
                 title: Text(c.nome),
                 subtitle: Text(
@@ -218,8 +220,8 @@ class _TrabalheConoscoScreenState extends State<TrabalheConoscoScreen> {
                 ),
                 trailing: c.cvUrl != null
                     ? IconButton(
-                        icon: const Icon(Icons.picture_as_pdf,
-                            color: Color(0xFFFF2D55)),
+                        icon: Icon(Icons.picture_as_pdf,
+                            color: Theme.of(ctx).primaryColor),
                         tooltip: 'Visualizar CV',
                         onPressed: () => Navigator.push(
                           ctx,
