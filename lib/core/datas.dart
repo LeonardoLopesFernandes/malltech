@@ -1,7 +1,8 @@
 /// Formata strings de data vindas da API para o padrão brasileiro
 /// (dia/mês/ano). Converte formatos como "2026/09/24", "2026-09-24",
 /// "2026/09/24 10:30" em "24/09/2026" ou "24/09/2026 10:30".
-String formatarData(String? entrada) {
+/// [separador] define o caractere entre dia/mês/ano (padrão "/").
+String formatarData(String? entrada, {String separador = '/'}) {
   if (entrada == null || entrada.trim().isEmpty) return '';
   final s = entrada.trim();
 
@@ -30,6 +31,6 @@ String formatarData(String? entrada) {
     mes = b.toString().padLeft(2, '0');
     ano = c.toString();
   }
-  final data = '$dia/$mes/$ano';
+  final data = '$dia$separador$mes$separador$ano';
   return hora == null ? data : '$data $hora';
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:malltech_flutter/core/datas.dart';
 import 'package:malltech_flutter/core/pedido_repo.dart';
 import 'package:malltech_flutter/core/session.dart';
 
@@ -169,21 +170,25 @@ class _PedidosScreenState extends State<PedidosScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 90),
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    total == 0 ? 'Nenhum Pedido' : 'Pedidos',
-                    style: const TextStyle(
-                      fontSize: 22,
-                      color: Color(0xFF555555),
+              // Label "Pedidos" já está no toolbar; aqui só mostra "Nenhum
+              // Pedido" quando a lista está vazia.
+              if (total == 0) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Nenhum Pedido',
+                      style: TextStyle(
+                        fontSize: 22,
+                        color: Color(0xFF555555),
+                      ),
                     ),
-                  ),
-                  const Icon(Icons.list_alt,
-                      size: 20, color: Color(0xFF666666)),
-                ],
-              ),
-              const SizedBox(height: 16),
+                    const Icon(Icons.list_alt,
+                        size: 20, color: Color(0xFF666666)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+              ],
               // Card "+ Pedido" só aparece quando não há pedidos.
               if (total == 0)
                 GestureDetector(
@@ -324,7 +329,8 @@ class _PedidoCardItemState extends State<_PedidoCardItem> {
                     const Icon(Icons.calendar_today, color: Colors.brown, size: 14),
                     const SizedBox(width: 4),
                     Text(
-                      c.dataExecutar ?? c.status,
+                      formatarData(c.dataExecutar, separador: '-') ??
+                          c.status,
                       style: const TextStyle(
                         color: Colors.brown,
                         fontWeight: FontWeight.bold,
@@ -355,7 +361,7 @@ class _PedidoCardItemState extends State<_PedidoCardItem> {
               _detalhe('Título', c.titulo),
               _detalhe('Tipo', c.tipo),
               _detalhe('Subtipo', c.subtipo ?? ''),
-              _detalhe('Execução', c.dataExecutar ?? ''),
+              _detalhe('Execução', formatarData(c.dataExecutar)),
               _detalhe('Status', c.status),
               const SizedBox(height: 8),
               Align(
@@ -612,7 +618,7 @@ class _PedidoDetalhePageState extends State<PedidoDetalhePage> {
                     children: [
                       _Linha('Protocolo', d.protocolo),
                       _Linha('Título', d.titulo),
-                      _Linha('Data', d.data),
+                      _Linha('Data', formatarData(d.data)),
                       _Linha('CPF', d.cpf),
                       _Linha('Telefone', d.telefone),
                       _Linha('Contratante', d.contratante),
