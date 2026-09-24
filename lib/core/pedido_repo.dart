@@ -344,9 +344,7 @@ class PedidoRepo {
     final subtipo = li.querySelector('.subtipo')?.text;
     final data = li.querySelector('[name=data_execucao]')?.attributes['value'];
     final agendado = _attr(li, 'agendado');
-    final status = _attr(li, 'data-status') ??
-        _attr(li, 'data-status-analise') ??
-        (agendado != null ? 'Agendado' : '');
+    final status = _extrairStatus(li, agendado);
     return PedidoCard(
       id: id,
       tipo: status,
@@ -355,6 +353,54 @@ class PedidoRepo {
       dataExecutar: data ?? agendado?.split(' ').first,
       status: status,
     );
+  }
+
+  /// Extrai o status do pedido de várias fontes do HTML.
+  static String _extrairStatus(Element li, String? agendado) {
+    // 1. Atributos com prefixo data-status (qualquer nome).
+    for (final entry in li.attributes.entries) {
+      final k = entry.key.toString().toLowerCase();
+      final v = entry.value.toString();
+      if (k.startsWith('data-status') && v.trim().isNotEmpty) {
+        return v.trim();
+      }
+    }
+    // 2. Elementos com atributo data-status.
+    for (final el in li.querySelectorAll('[data-status]')) {
+      final v = el.attributes['data-status'];
+      if (v != null && v.trim().isNotEmpty) return v.trim();
+    }
+    // 3. Classes que indiquem status (ex.: status-novo, status-aprovado).
+    final classes = (li.attributes['class'] ?? '') +
+        ' ' +
+        (li.querySelector('.tiles')?.attributes['class'] ?? '');
+    for (final palavra in const ['novo', 'pendente', 'andamento', 'execucao',
+        'aprovado', 'reprovado', 'recusado', 'cancelado', 'agendado']) {
+      if (classes.toLowerCase().contains('status-$palavra') ||
+          classes.toLowerCase().contains('pedido-$palavra') ||
+          classes.toLowerCase().contains('tile-$palavra')) {
+        return _normalizarStatus(palavra);
+      }
+    }
+    // 4. Agendado.
+    if (agendado != null) return 'Agendado';
+    // 5. Texto do badge/span.
+    final badge = li.querySelector('.badge, .status, [class*=status]')?.text;
+    if (badge != null && badge.trim().isNotEmpty) {
+      return badge.trim();
+    }
+    return '';
+  }
+
+  static String _normalizarStatus(String s) {
+    switch (s) {
+      case 'execucao':
+        return 'Em andamento';
+      case 'pendente':
+        return 'Novo';
+      default:
+        return s[0].toUpperCase() + s.substring(1);
+    }
   }
 
   static DetalhePedido? parseDetalhePedido(int id, String html) {

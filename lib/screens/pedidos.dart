@@ -60,7 +60,8 @@ class _PedidosScreenState extends State<PedidosScreen> {
       final status = c.status.toLowerCase();
       switch (chave) {
         case 'novo':
-          return status.contains('novo') ||
+          return status.isEmpty ||
+              status.contains('novo') ||
               status.contains('pendente') ||
               status.contains('aguardando');
         case 'andamento':
@@ -68,7 +69,8 @@ class _PedidosScreenState extends State<PedidosScreen> {
               status.contains('executando') ||
               status.contains('analise') ||
               status.contains('análise') ||
-              status.contains('em execução');
+              status.contains('em execução') ||
+              status.contains('agendado');
         case 'aprovado':
           return status.contains('aprovado');
         case 'reprovado':
@@ -107,7 +109,7 @@ class _PedidosScreenState extends State<PedidosScreen> {
         ],
       ),
       drawer: Drawer(
-        backgroundColor: const Color(0xFF00A091),
+        backgroundColor: Theme.of(context).primaryColor,
         child: SafeArea(
           child: ListView(
             padding: const EdgeInsets.only(top: 20),
