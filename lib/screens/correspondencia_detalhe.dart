@@ -101,14 +101,14 @@ class CorrespondenciaDetalhePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _linha('Status', c.status),
-                  _linha('Tipo', c.tipo),
-                  _linha('Código', c.codigo),
-                  _linha('Entrada', formatarData(c.entradaFormatada)),
-                  _linha('Saída', formatarData(c.saidaFormatada)),
-                  _linha('Postagem', formatarData(c.postagem)),
-                  _linha('Cadastro', formatarData(c.cadFormatada)),
-                  _linha('CDD', c.cdd),
+                  _linha(context, 'Status', c.status),
+                  _linha(context, 'Tipo', c.tipo),
+                  _linha(context, 'Código', c.codigo),
+                  _linha(context, 'Entrada', formatarData(c.entradaFormatada)),
+                  _linha(context, 'Saída', formatarData(c.saidaFormatada)),
+                  _linha(context, 'Postagem', formatarData(c.postagem)),
+                  _linha(context, 'Cadastro', formatarData(c.cadFormatada)),
+                  _linha(context, 'CDD', c.cdd),
                 ],
               ),
             ),
@@ -127,8 +127,8 @@ class CorrespondenciaDetalhePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _linha('Nome', c.retiradoNome),
-                    _linha('CPF', c.retiradoCpf),
+                    _linha(context, 'Nome', c.retiradoNome),
+                    _linha(context, 'CPF', c.retiradoCpf),
                   ],
                 ),
               ),
@@ -154,18 +154,20 @@ class CorrespondenciaDetalhePage extends StatelessWidget {
     );
   }
 
-  Widget _linha(String rotulo, String valor) {
+  Widget _linha(BuildContext context, String rotulo, String valor) {
     if (valor.isEmpty) return const SizedBox.shrink();
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: RichText(
         text: TextSpan(
-          style: const TextStyle(color: Colors.black87, fontSize: 13),
+          style: TextStyle(color: onSurface, fontSize: 13),
           children: [
             TextSpan(
               text: '$rotulo: ',
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: Color(0xFF4C505B)),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary),
             ),
             TextSpan(text: valor),
           ],

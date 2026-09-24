@@ -80,16 +80,16 @@ class CurriculoDetalhePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _linha('CPF', c.cpf),
-                  _linha('Nascimento', c.nascimento),
-                  _linha('Sexo', c.sexo),
-                  _linha('Escolaridade', c.escolaridade),
-                  _linha('Cidade', c.cidade),
-                  _linha('Telefone', c.telefone),
-                  _linha('E-mail', c.email),
-                  _linha('Enviado em', c.data),
-                  _linha('Lido', c.lido ? 'Sim' : 'Não'),
-                  _linha('E-mail enviado', c.emailEnviado ? 'Sim' : 'Não'),
+                  _linha(context, 'CPF', c.cpf),
+                  _linha(context, 'Nascimento', c.nascimento),
+                  _linha(context, 'Sexo', c.sexo),
+                  _linha(context, 'Escolaridade', c.escolaridade),
+                  _linha(context, 'Cidade', c.cidade),
+                  _linha(context, 'Telefone', c.telefone),
+                  _linha(context, 'E-mail', c.email),
+                  _linha(context, 'Enviado em', c.data),
+                  _linha(context, 'Lido', c.lido ? 'Sim' : 'Não'),
+                  _linha(context, 'E-mail enviado', c.emailEnviado ? 'Sim' : 'Não'),
                 ],
               ),
             ),
@@ -152,18 +152,20 @@ class CurriculoDetalhePage extends StatelessWidget {
     );
   }
 
-  Widget _linha(String rotulo, String valor) {
+  Widget _linha(BuildContext context, String rotulo, String valor) {
     if (valor.isEmpty) return const SizedBox.shrink();
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: RichText(
         text: TextSpan(
-          style: const TextStyle(color: Colors.black87, fontSize: 13),
+          style: TextStyle(color: onSurface, fontSize: 13),
           children: [
             TextSpan(
               text: '$rotulo: ',
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: Color(0xFF4C505B)),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary),
             ),
             TextSpan(text: valor),
           ],

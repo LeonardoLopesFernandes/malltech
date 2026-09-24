@@ -178,15 +178,16 @@ class _PedidosScreenState extends State<PedidosScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Nenhum Pedido',
                       style: TextStyle(
                         fontSize: 22,
-                        color: Color(0xFF555555),
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
-                    const Icon(Icons.list_alt,
-                        size: 20, color: Color(0xFF666666)),
+                    Icon(Icons.list_alt,
+                        size: 20,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -198,21 +199,26 @@ class _PedidosScreenState extends State<PedidosScreen> {
                   child: Container(
                     height: 130,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFDCDCDC),
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.add,
-                              size: 32, color: Color(0xFF88929A)),
-                          SizedBox(width: 8),
+                              size: 32,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant),
+                          const SizedBox(width: 8),
                           Text('Pedido',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF88929A),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                               )),
                         ],
                       ),
@@ -636,7 +642,8 @@ class _PedidoDetalhePageState extends State<PedidoDetalhePage> {
               const Text('Pessoas', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 8),
               if (d.pessoas.isEmpty)
-                const Text('Nenhuma pessoa', style: TextStyle(color: Colors.grey))
+                Text('Nenhuma pessoa',
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant))
               else
                 ...d.pessoas.map((p) => _PessoaCard(p: p)),
 
@@ -646,12 +653,13 @@ class _PedidoDetalhePageState extends State<PedidoDetalhePage> {
               const Text('Mensagens', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 8),
               if (d.mensagens.isEmpty)
-                const Text('Nenhuma mensagem', style: TextStyle(color: Colors.grey))
+                Text('Nenhuma mensagem',
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant))
               else
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blueGrey[50],
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -662,7 +670,7 @@ class _PedidoDetalhePageState extends State<PedidoDetalhePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('${m.dataFormatada} - ${m.usuario}',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.blueGrey)),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Theme.of(context).colorScheme.primary)),
                           const SizedBox(height: 4),
                           Text(m.mensagem),
                         ],
@@ -768,13 +776,18 @@ class _Linha extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (valor.isEmpty) return const SizedBox.shrink();
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: RichText(
         text: TextSpan(
-          style: const TextStyle(color: Colors.black87, fontSize: 13),
+          style: TextStyle(color: onSurface, fontSize: 13),
           children: [
-            TextSpan(text: '$rotulo: ', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4C505B))),
+            TextSpan(
+                text: '$rotulo: ',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary)),
             TextSpan(text: valor),
           ],
         ),

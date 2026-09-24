@@ -52,13 +52,15 @@ extension _S on String {
   }
 }
 
-Widget _info(String rotulo, String valor) {
+Widget _info(BuildContext context, String rotulo, String valor) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: [
       Text(rotulo,
-          style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurfaceVariant)),
       const SizedBox(height: 2),
       Text(valor,
           style:
@@ -138,9 +140,9 @@ class _CursosScreenState extends State<CursosScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _info('Data', formatarData(c.data)),
+                        _info(ctx, 'Data', formatarData(c.data)),
                         const SizedBox(height: 8),
-                        _info('Vagas',
+                        _info(ctx, 'Vagas',
                             c.vagas.isNotEmpty ? c.vagas : '-'),
                       ],
                     ),

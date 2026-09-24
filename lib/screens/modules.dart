@@ -269,8 +269,9 @@ class _FaleConoscoScreenState extends State<FaleConoscoScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(rotulo,
-              style:
-                  const TextStyle(fontSize: 12, color: Colors.grey)),
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant)),
           Text(valor,
               style: const TextStyle(
                   fontSize: 15, fontWeight: FontWeight.w600)),
@@ -648,8 +649,9 @@ class _GuiaScreenState extends State<GuiaScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(rotulo,
-              style:
-                  const TextStyle(fontSize: 12, color: Colors.grey)),
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant)),
           Text(valor,
               style: const TextStyle(
                   fontSize: 15, fontWeight: FontWeight.w600)),
