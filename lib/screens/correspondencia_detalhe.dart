@@ -31,8 +31,8 @@ class CorrespondenciaDetalhePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Correspondência'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
         elevation: 0.5,
         actions: [
           IconButton(
@@ -62,7 +62,7 @@ class CorrespondenciaDetalhePage extends StatelessWidget {
         children: [
           // Cabeçalho
           Card(
-            color: Colors.amber[700],
+            color: Theme.of(context).primaryColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: Padding(
               padding: const EdgeInsets.all(16),

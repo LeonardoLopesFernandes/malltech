@@ -14,8 +14,8 @@ class CurriculoDetalhePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Currículo'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
         elevation: 0.5,
         actions: [
           if (cv != null)
@@ -39,7 +39,7 @@ class CurriculoDetalhePage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           Card(
-            color: Colors.amber[700],
+            color: Theme.of(context).primaryColor,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: Padding(

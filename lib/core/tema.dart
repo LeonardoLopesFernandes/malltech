@@ -29,6 +29,9 @@ class TemaApp extends ChangeNotifier {
         brightness: _escuro ? Brightness.dark : Brightness.light,
       ),
       useMaterial3: true,
+      // Modo escuro AMOLED: fundo preto puro.
+      scaffoldBackgroundColor:
+          _escuro ? const Color(0xFF000000) : base.scaffoldBackgroundColor,
     );
   }
 

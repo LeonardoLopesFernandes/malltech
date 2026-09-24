@@ -97,7 +97,7 @@ class _PedidosScreenState extends State<PedidosScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: const Color(0xFFF2F5F8),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Pedidos'),
         actions: [
@@ -309,8 +309,9 @@ class _PedidoCardItemState extends State<_PedidoCardItem> {
   @override
   Widget build(BuildContext context) {
     final c = widget.card;
+    final corBadge = Theme.of(context).primaryColor;
     return Card(
-      color: Colors.amber[700],
+      color: corBadge,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       elevation: 2,
@@ -411,7 +412,7 @@ class _PedidoCardItemState extends State<_PedidoCardItem> {
                     ),
                     child: Icon(
                       _expanded ? Icons.remove : Icons.add,
-                      color: Colors.amber,
+                      color: corBadge,
                       size: 22,
                     ),
                   ),
@@ -559,8 +560,8 @@ class _PedidoDetalhePageState extends State<PedidoDetalhePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Pedido #${widget.id}'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
         elevation: 0.5,
       ),
       body: FutureBuilder<DetalhePedido>(
@@ -587,7 +588,7 @@ class _PedidoDetalhePageState extends State<PedidoDetalhePage> {
             children: [
               // 1. Card de destaque
               Card(
-                color: Colors.amber[700],
+                color: Theme.of(context).primaryColor,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -709,7 +710,7 @@ class _PedidoDetalhePageState extends State<PedidoDetalhePage> {
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         child: Row(
           children: [
             Expanded(
@@ -729,7 +730,10 @@ class _PedidoDetalhePageState extends State<PedidoDetalhePage> {
             const SizedBox(width: 8),
             OutlinedButton(
               style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16)),
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                foregroundColor: Theme.of(context).colorScheme.onSurface,
+                side: BorderSide(color: Theme.of(context).colorScheme.outline),
+              ),
               onPressed: _busy
                   ? null
                   : () => _acao(() => PedidoRepo.reabrir(widget.id), 'Reaberto'),

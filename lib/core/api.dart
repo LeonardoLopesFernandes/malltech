@@ -147,6 +147,24 @@ class Api {
     return _executeSimple(req);
   }
 
+  static Future<String> postBackendJson(
+      String path, Map<String, dynamic> body) async {
+    final req = http.Request(
+        'POST', Uri.parse('${ApiConfig.backend}$path'));
+    req.headers.addAll(_backendHeaders());
+    req.headers['Content-Type'] = 'application/json';
+    req.body = jsonEncode(body);
+    return _executeSimple(req);
+  }
+
+  static Future<String> deleteBackend(String path) async {
+    final req = http.Request(
+        'DELETE', Uri.parse('${ApiConfig.backend}$path'));
+    req.headers.addAll(_backendHeaders());
+    req.body = '';
+    return _executeSimple(req);
+  }
+
   static Future<String> uploadR2(List<int> bytes, String fileName) async {
     final req = http.MultipartRequest(
         'POST', Uri.parse('https://upload-r2.madnezz.com.br/'));
