@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:malltech_flutter/core/datas.dart';
 import 'package:malltech_flutter/core/repos.dart';
 import 'package:malltech_flutter/core/models.dart';
 import 'package:malltech_flutter/core/api.dart';
@@ -214,7 +215,7 @@ class _TrabalheConoscoScreenState extends State<TrabalheConoscoScreen> {
                 ),
                 title: Text(c.nome),
                 subtitle: Text(
-                  [c.vaga, c.cargo, c.email, c.data]
+                  [c.vaga, c.cargo, c.email, formatarData(c.data)]
                       .where((e) => e.isNotEmpty)
                       .join(' • '),
                 ),

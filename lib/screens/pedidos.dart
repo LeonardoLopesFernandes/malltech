@@ -54,14 +54,38 @@ class _PedidosScreenState extends State<PedidosScreen> {
   List<PedidoColuna> _colunasFiltradas(List<PedidoColuna> cols) {
     if (_filtroStatus == null) return cols;
     final chave = _filtroStatus!;
+    // Palavras-chave por status (ignorando acentos e maiúsculas).
+    bool coincide(PedidoCard c) {
+      final status = c.status.toLowerCase();
+      switch (chave) {
+        case 'novo':
+          return status.contains('novo') ||
+              status.contains('pendente') ||
+              status.contains('aguardando');
+        case 'andamento':
+          return status.contains('andamento') ||
+              status.contains('executando') ||
+              status.contains('analise') ||
+              status.contains('análise') ||
+              status.contains('em execução');
+        case 'aprovado':
+          return status.contains('aprovado');
+        case 'reprovado':
+          return status.contains('reprovado') ||
+              status.contains('recusado');
+        case 'cancelado':
+          return status.contains('cancelado') ||
+              status.contains('cancelada');
+        default:
+          return status.contains(chave);
+      }
+    }
+
     return [
       for (final col in cols)
         PedidoColuna(
           col.nome,
-          col.cards
-              .where((c) =>
-                  c.status.toLowerCase().contains(chave))
-              .toList(),
+          col.cards.where(coincide).toList(),
         ),
     ];
   }
@@ -160,32 +184,34 @@ class _PedidosScreenState extends State<PedidosScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              GestureDetector(
-                onTap: _novoPedido,
-                child: Container(
-                  height: 130,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFDCDCDC),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: const Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.add,
-                            size: 32, color: Color(0xFF88929A)),
-                        SizedBox(width: 8),
-                        Text('Pedido',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF88929A),
-                            )),
-                      ],
+              // Card "+ Pedido" só aparece quando não há pedidos.
+              if (total == 0)
+                GestureDetector(
+                  onTap: _novoPedido,
+                  child: Container(
+                    height: 130,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFDCDCDC),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.add,
+                              size: 32, color: Color(0xFF88929A)),
+                          SizedBox(width: 8),
+                          Text('Pedido',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF88929A),
+                              )),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
               const SizedBox(height: 12),
               for (final col in cols)
                 if (col.cards.isNotEmpty) ...[
@@ -831,8 +857,66 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
     );
     if (d == null) return;
     String valor = _fmtData(d);
-    if (comHora) valor += ' 00:00';
+    if (comHora) {
+      final hora = await _pickHora();
+      if (hora == null) return;
+      valor += ' $hora';
+    }
     ctrl.text = valor;
+  }
+
+  /// Seletor de horário em intervalos de 5 minutos (00:00, 00:05, ... 23:55).
+  Future<String?> _pickHora() async {
+    final horarios = <String>[];
+    for (var h = 0; h < 24; h++) {
+      for (var m = 0; m < 60; m += 5) {
+        horarios.add(
+          '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}',
+        );
+      }
+    }
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Selecione o horário'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 300,
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+            ),
+            itemCount: horarios.length,
+            itemBuilder: (ctx, i) => InkWell(
+              onTap: () => Navigator.pop(ctx, horarios[i]),
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Theme.of(ctx).primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Theme.of(ctx).primaryColor.withOpacity(0.4),
+                  ),
+                ),
+                child: Text(
+                  horarios[i],
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _enviar() async {
@@ -909,32 +993,42 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
             return const Center(child: Text('Nenhum tipo de pedido disponível'));
           }
           if (_tipo == null) {
-            String? ultimoGrupo;
+            // Agrupa os tipos por tópico, preservando a ordem de aparição.
+            final grupos = <String, List<TipoPedido>>{};
+            final ordemGrupos = <String>[];
+            for (final t in tipos) {
+              final chave = t.grupo == null || t.grupo!.isEmpty
+                  ? 'Outros'
+                  : t.grupo!;
+              if (!grupos.containsKey(chave)) {
+                grupos[chave] = [];
+                ordemGrupos.add(chave);
+              }
+              grupos[chave]!.add(t);
+            }
             return ListView(
               padding: const EdgeInsets.all(12),
-              children: tipos.map((t) {
-                final Widget cabecalho = t.grupo != null && t.grupo != ultimoGrupo
-                    ? (() {
-                        ultimoGrupo = t.grupo;
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 10, bottom: 4),
-                          child: Text(t.grupo!, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-                        );
-                      })()
-                    : const SizedBox.shrink();
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    cabecalho,
+              children: [
+                for (final grupo in ordemGrupos) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, bottom: 4),
+                    child: Text(
+                      grupo,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  for (final t in grupos[grupo]!)
                     Card(
                       child: ListTile(
                         title: Text(t.nome),
                         onTap: () => setState(() => _tipo = t),
                       ),
                     ),
-                  ],
-                );
-              }).toList(),
+                ],
+              ],
             );
           }
           return _form();

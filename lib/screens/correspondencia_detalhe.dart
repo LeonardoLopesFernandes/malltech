@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:malltech_flutter/core/datas.dart';
 import 'package:malltech_flutter/core/models.dart';
 import 'package:malltech_flutter/core/repos.dart';
 
@@ -103,10 +104,10 @@ class CorrespondenciaDetalhePage extends StatelessWidget {
                   _linha('Status', c.status),
                   _linha('Tipo', c.tipo),
                   _linha('Código', c.codigo),
-                  _linha('Entrada', c.entradaFormatada),
-                  _linha('Saída', c.saidaFormatada),
-                  _linha('Postagem', c.postagem),
-                  _linha('Cadastro', c.cadFormatada),
+                  _linha('Entrada', formatarData(c.entradaFormatada)),
+                  _linha('Saída', formatarData(c.saidaFormatada)),
+                  _linha('Postagem', formatarData(c.postagem)),
+                  _linha('Cadastro', formatarData(c.cadFormatada)),
                   _linha('CDD', c.cdd),
                 ],
               ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:html/dom.dart' hide Text;
 import 'package:html/parser.dart' as html_parser;
 import 'package:malltech_flutter/core/api.dart';
+import 'package:malltech_flutter/core/datas.dart';
 import 'package:malltech_flutter/widgets/web_view_screen.dart';
 
 class Curso {
@@ -128,7 +129,7 @@ class _CursosScreenState extends State<CursosScreen> {
               return ListTile(
                 title: Text(c.titulo),
                 subtitle: c.vagas.isNotEmpty ? Text('Vagas: ${c.vagas}') : null,
-                trailing: Chip(label: Text(c.data)),
+                trailing: Chip(label: Text(formatarData(c.data))),
                 onTap: () => showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
@@ -137,7 +138,7 @@ class _CursosScreenState extends State<CursosScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _info('Data', c.data),
+                        _info('Data', formatarData(c.data)),
                         const SizedBox(height: 8),
                         _info('Vagas',
                             c.vagas.isNotEmpty ? c.vagas : '-'),

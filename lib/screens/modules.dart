@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:malltech_flutter/core/api.dart';
+import 'package:malltech_flutter/core/datas.dart';
 import 'package:malltech_flutter/core/session.dart';
 import 'package:malltech_flutter/core/repos.dart' show ComunicadoRepo,
     ArquivosRepo, FaleConoscoRepo, BoletosRepo, GuiaRepo, CorrespondenciaRepo;
@@ -138,7 +139,9 @@ class _ComunicadosScreenState extends State<ComunicadosScreen> {
         return ListTile(
           title: Text(c.nome.isNotEmpty ? c.nome : c.pessoa),
           subtitle: Text(
-            [c.empreendimento, c.data].where((e) => e.isNotEmpty).join(' • '),
+            [c.empreendimento, formatarData(c.data)]
+                .where((e) => e.isNotEmpty)
+                .join(' • '),
           ),
           trailing: lido
               ? const Icon(Icons.check_circle,
@@ -192,7 +195,9 @@ class ArquivosScreen extends StatelessWidget {
           ),
           title: Text(d.titulo),
           subtitle: Text(
-            [d.tipo, d.vigencia].where((e) => e.isNotEmpty).join(' • '),
+            [d.tipo, formatarData(d.vigencia)]
+                .where((e) => e.isNotEmpty)
+                .join(' • '),
           ),
           onTap: () async {
             try {

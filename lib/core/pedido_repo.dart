@@ -77,7 +77,9 @@ class TipoPedido {
   final String nome;
   final int departamentoId;
   final String? grupo;
-  TipoPedido(this.id, this.nome, this.departamentoId, this.grupo);
+  final int ordemGrupo;
+  TipoPedido(this.id, this.nome, this.departamentoId, this.grupo,
+      [this.ordemGrupo = 0]);
 }
 
 class Departamento {
@@ -451,9 +453,10 @@ class PedidoRepo {
     final subStarts =
         subExpr.allMatches(html).map((m) => m.start).toList();
     final leaf = RegExp(r'<span\s+data-tipo="(\d+)"[^>]*>([^<]+)</span>');
-    final groupLabel =
-        RegExp(r'</ul>\s*<span\s*>([^<]{1,120})</span>');
+    final groupLabel = RegExp(r'</ul>\s*<span\s*>([^<]{1,120})</span>');
 
+    // Agrupa na ordem de aparição no HTML: cada grupo recebe seus itens.
+    var ordem = 0;
     for (var i = 0; i < subStarts.length; i++) {
       final start = subStarts[i];
       final end = i + 1 < subStarts.length ? subStarts[i + 1] : html.length;
@@ -465,15 +468,20 @@ class PedidoRepo {
       for (final m in leaf.allMatches(zone)) {
         final id = int.parse(m.group(1)!);
         byId.putIfAbsent(
-            id, () => TipoPedido(id, m.group(2)!.trim(), 0, grupo));
+            id, () => TipoPedido(id, m.group(2)!.trim(), 0, grupo, ordem));
       }
+      ordem++;
     }
     for (final m in leaf.allMatches(html)) {
       final id = int.parse(m.group(1)!);
-      byId.putIfAbsent(id, () => TipoPedido(id, m.group(2)!.trim(), 0, null));
+      byId.putIfAbsent(id, () => TipoPedido(id, m.group(2)!.trim(), 0, null, ordem));
     }
     final list = byId.values.toList();
-    list.sort((a, b) => a.nome.toLowerCase().compareTo(b.nome.toLowerCase()));
+    // Mantém a ordem de aparição (grupos juntos e itens na ordem do HTML).
+    list.sort((a, b) {
+      if (a.ordemGrupo != b.ordemGrupo) return a.ordemGrupo.compareTo(b.ordemGrupo);
+      return a.nome.toLowerCase().compareTo(b.nome.toLowerCase());
+    });
     return list;
   }
 
