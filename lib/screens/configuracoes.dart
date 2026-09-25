@@ -40,8 +40,8 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
       final bytes = await img.readAsBytes();
       final nome =
           'perfil_${DateTime.now().millisecondsSinceEpoch}.png';
-      final url = await ConfigRepo.uploadFoto(bytes, nome);
-      await ConfigRepo.definirImagem(url);
+      final payload = await ConfigRepo.uploadFoto(bytes, nome);
+      await ConfigRepo.definirImagem(payload);
       _toast('Foto atualizada');
     } catch (e) {
       _toast('Falha ao atualizar foto: $e');

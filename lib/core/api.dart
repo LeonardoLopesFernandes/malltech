@@ -165,7 +165,8 @@ class Api {
     return _executeSimple(req);
   }
 
-  static Future<String> uploadR2(List<int> bytes, String fileName) async {
+  static Future<Map<String, dynamic>> uploadR2(
+      List<int> bytes, String fileName) async {
     final req = http.MultipartRequest(
         'POST', Uri.parse('https://upload-r2.madnezz.com.br/'));
     req.headers['Authorization'] =
@@ -179,12 +180,8 @@ class Api {
       throw ApiException('HTTP ${response.statusCode}', response.statusCode);
     }
     final data = jsonDecode(response.body);
-    String path = '';
-    if (data is Map) {
-      path = (data['path'] ?? '').toString();
-    }
-    if (path.startsWith('http')) return path;
-    return 'https://upload-r2.madnezz.com.br/$path';
+    if (data is Map) return data.cast<String, dynamic>();
+    return <String, dynamic>{};
   }
 
   static Future<String> getBackend(String path) async {
