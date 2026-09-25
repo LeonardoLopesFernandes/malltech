@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:malltech_flutter/core/api.dart';
 import 'package:malltech_flutter/core/repos.dart';
 import 'package:malltech_flutter/core/session.dart';
 import 'package:malltech_flutter/core/tema.dart';
@@ -41,7 +42,9 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
       final nome =
           'perfil_${DateTime.now().millisecondsSinceEpoch}.png';
       final payload = await ConfigRepo.uploadFoto(bytes, nome);
-      await ConfigRepo.definirImagem(payload);
+      final url = Api.urlDoUpload(payload);
+      if (url == null) throw ApiException('Falha ao processar o upload');
+      await ConfigRepo.definirImagem(url);
       _toast('Foto atualizada');
     } catch (e) {
       _toast('Falha ao atualizar foto: $e');

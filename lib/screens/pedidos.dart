@@ -335,13 +335,14 @@ class _PedidoCardItemState extends State<_PedidoCardItem> {
                 ),
                 Row(
                   children: [
-                    const Icon(Icons.calendar_today, color: Colors.brown, size: 14),
+                    const Icon(Icons.calendar_today,
+                        color: Colors.white70, size: 14),
                     const SizedBox(width: 4),
                     Text(
                       formatarData(c.dataExecutar, separador: '-') ??
                           c.status,
                       style: const TextStyle(
-                        color: Colors.brown,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
                       ),
@@ -397,7 +398,7 @@ class _PedidoCardItemState extends State<_PedidoCardItem> {
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                   onPressed: () => _cancelar(context),
-                  icon: const Icon(Icons.block, color: Colors.black45, size: 22),
+                  icon: const Icon(Icons.block, color: Colors.white70, size: 22),
                   tooltip: 'Cancelar pedido',
                 ),
                 InkWell(
@@ -1068,15 +1069,24 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
       padding: const EdgeInsets.all(16),
       children: [
         Card(
-          color: const Color(0xFFFDF3F4),
+          color: Theme.of(context).primaryColor.withValues(alpha: 0.15),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
               children: [
                 Expanded(
-                  child: Text(_tipo!.nome, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text(_tipo!.nome,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface)),
                 ),
-                TextButton(onPressed: () => setState(() => _tipo = null), child: const Text('Trocar tipo')),
+                TextButton(
+                    onPressed: () => setState(() => _tipo = null),
+                    child: Text(
+                      'Trocar tipo',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary),
+                    )),
               ],
             ),
           ),

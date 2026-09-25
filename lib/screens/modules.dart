@@ -3,6 +3,7 @@ import 'package:html/parser.dart' as html_parser;
 import 'package:malltech_flutter/core/api.dart';
 import 'package:malltech_flutter/core/datas.dart';
 import 'package:malltech_flutter/core/session.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:malltech_flutter/core/repos.dart' show ComunicadoRepo,
     ArquivosRepo, FaleConoscoRepo, BoletosRepo, GuiaRepo, CorrespondenciaRepo;
 import 'package:malltech_flutter/core/models.dart';
@@ -42,7 +43,38 @@ class ComunicadosScreen extends StatefulWidget {
 }
 
 class _ComunicadosScreenState extends State<ComunicadosScreen> {
+  static const _kLidos = 'comunicados_lidos';
   final _lidos = <int>{};
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarLidos();
+  }
+
+  Future<void> _carregarLidos() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lista = prefs.getStringList(_kLidos) ?? [];
+      _lidos
+        ..clear()
+        ..addAll(lista.map(int.parse).toList());
+    } catch (_) {}
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _salvarLidos() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(
+          _kLidos, _lidos.map((e) => e.toString()).toList());
+    } catch (_) {}
+  }
+
+  void _marcarLido(int id) {
+    _lidos.add(id);
+    _salvarLidos();
+  }
 
   Future<void> _abrirDetalhe(BuildContext context, Comunicado c) async {
     showDialog(
@@ -99,7 +131,7 @@ class _ComunicadosScreenState extends State<ComunicadosScreen> {
                 try {
                   await ComunicadoRepo.confirmar(c.id);
                   if (ctx.mounted) {
-                    setState(() => _lidos.add(c.id));
+                    setState(() => _marcarLido(c.id));
                     Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -153,7 +185,7 @@ class _ComunicadosScreenState extends State<ComunicadosScreen> {
                     try {
                       await ComunicadoRepo.confirmar(c.id);
                       if (ctx.mounted) {
-                        setState(() => _lidos.add(c.id));
+setState(() => _marcarLido(c.id));
                         ScaffoldMessenger.of(ctx).showSnackBar(
                           const SnackBar(
                               content: Text('Comunicado confirmado')),

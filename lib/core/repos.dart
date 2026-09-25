@@ -262,8 +262,8 @@ class ConfigRepo {
   static Future<void> adiarSenha() =>
       Api.postBackendEmpty('/api/v1/usuarios/troca/password/adiar');
 
-  static Future<void> definirImagem(Map<String, dynamic> arquivo) =>
-      Api.postBackendJson('/api/v1/usuarios/imagem', arquivo);
+  static Future<void> definirImagem(String url) =>
+      Api.postBackendJson('/api/v1/usuarios/imagem', {'imagem': url});
 
   static Future<void> removerImagem() =>
       Api.deleteBackend('/api/v1/usuarios/imagem/remove');

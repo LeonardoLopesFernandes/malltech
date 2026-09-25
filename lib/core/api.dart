@@ -184,6 +184,21 @@ class Api {
     return <String, dynamic>{};
   }
 
+  /// Extrai a URL pública do payload de upload R2 (`files[0].id`).
+  static String? urlDoUpload(Map<String, dynamic> payload) {
+    try {
+      final files = payload['files'];
+      if (files is List && files.isNotEmpty) {
+        final primeiro = files.first;
+        if (primeiro is Map) {
+          final id = (primeiro['id'] ?? '').toString();
+          if (id.isNotEmpty) return 'https://upload-r2.madnezz.com.br/$id';
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
   static Future<String> getBackend(String path) async {
     final url = '${ApiConfig.backend}$path';
     final req = http.Request('GET', Uri.parse(url));
