@@ -45,6 +45,8 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
       final url = Api.urlDoUpload(payload);
       if (url == null) throw ApiException('Falha ao processar o upload');
       await ConfigRepo.definirImagem(url);
+      Session.atualizarImagem(url);
+      if (mounted) setState(() {});
       _toast('Foto atualizada');
     } catch (e) {
       _toast('Falha ao atualizar foto: $e');

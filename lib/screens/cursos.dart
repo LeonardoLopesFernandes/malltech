@@ -3,7 +3,6 @@ import 'package:html/dom.dart' hide Text;
 import 'package:html/parser.dart' as html_parser;
 import 'package:malltech_flutter/core/api.dart';
 import 'package:malltech_flutter/core/datas.dart';
-import 'package:malltech_flutter/widgets/web_view_screen.dart';
 
 class Curso {
   final int id;

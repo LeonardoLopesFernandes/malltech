@@ -125,6 +125,57 @@ class GuiaRepo {
           'integrated': 'true',
         },
       );
+
+  /// Envia um novo produto para a vitrine.
+  static Future<void> inserir({
+    required String nome,
+    required String descricao,
+    required String valorDe,
+    required String valorPor,
+    required String desconto,
+    required String whatsapp,
+    required String telefone,
+    required String email,
+    required String ecom,
+    required String dataEntrada,
+    required String dataSaida,
+    required String sku,
+    required String ifood,
+    required String uberEats,
+    required String rappi,
+    required String posicao,
+    required String instagram,
+    required String categoria,
+  }) async {
+    await Api.ensurePortalSession();
+    await Api.postForm(
+      '/systems/guia/api/guia.php?do=insert',
+      fields: {
+        'p': 'insert',
+        'integrated': 'true',
+        'loja_id': Session.usuario.value?.lojaId.toString() ?? '',
+        'n352': nome,
+        'n353': descricao,
+        'n420': valorDe,
+        'n354': valorPor,
+        'n422': desconto,
+        'n355': whatsapp,
+        'n357': telefone,
+        'n358': email,
+        'n359': ecom,
+        'n360': dataEntrada,
+        'n361': dataSaida,
+        'n1717': sku,
+        'n1188': ifood,
+        'n1189': uberEats,
+        'n1190': rappi,
+        'n421': posicao,
+        'n1282': instagram,
+        'n423': categoria,
+      },
+      repeated: const [],
+    );
+  }
 }
 
 class CorrespondenciaRepo {

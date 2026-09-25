@@ -111,6 +111,26 @@ class Session {
     _prefs?.setBool('lembrar_senha', value);
   }
 
+  /// Atualiza a imagem de perfil do usuário local e persiste.
+  static void atualizarImagem(String url) {
+    final u = usuario.value;
+    if (u == null) return;
+    final novo = Usuario(
+      id: u.id,
+      lojaId: u.lojaId,
+      empreendimentoId: u.empreendimentoId,
+      login: u.login,
+      nome: u.nome,
+      lojaNome: u.lojaNome,
+      empreendimentoNome: u.empreendimentoNome,
+      isAdmin: u.isAdmin,
+      acessos: u.acessos,
+      imagem: url,
+    );
+    usuario.value = novo;
+    _prefs?.setString('usuario', jsonEncode(_usuarioToJson(novo)));
+  }
+
   static bool deveSalvarSenha() => _prefs?.getBool('lembrar_senha') ?? false;
 
   static void clear() {
@@ -189,6 +209,11 @@ class Session {
       return fallback;
     }
 
+    String imagem = obj['imagem'] is String ? obj['imagem'] : '';
+    if (imagem.isEmpty && obj['pessoa'] is Map) {
+      final p = obj['pessoa'] as Map;
+      imagem = p['imagem'] is String ? p['imagem'] : '';
+    }
     return Usuario(
       id: obj['id'] ?? 0,
       lojaId: obj['loja_id'] ?? 0,
@@ -199,7 +224,7 @@ class Session {
       empreendimentoNome: nomeDe(obj['empreendimento'], ''),
       isAdmin: obj['is_admin'] ?? false,
       acessos: acessos,
-      imagem: obj['imagem'] is String ? obj['imagem'] : '',
+      imagem: imagem,
     );
   }
 
@@ -208,7 +233,10 @@ class Session {
         'loja_id': u.lojaId,
         'empreendimento_id': u.empreendimentoId,
         'login': u.login,
-        'pessoa': u.nome,
+        'pessoa': {
+          'nome': u.nome,
+          'imagem': u.imagem,
+        },
         'loja': u.lojaNome,
         'empreendimento': u.empreendimentoNome,
         'is_admin': u.isAdmin,

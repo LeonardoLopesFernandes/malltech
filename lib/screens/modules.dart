@@ -8,9 +8,9 @@ import 'package:malltech_flutter/core/repos.dart' show ComunicadoRepo,
     ArquivosRepo, FaleConoscoRepo, BoletosRepo, GuiaRepo, CorrespondenciaRepo;
 import 'package:malltech_flutter/core/models.dart';
 import 'package:malltech_flutter/widgets/list_screen.dart';
-import 'package:malltech_flutter/widgets/web_view_screen.dart';
 import 'package:malltech_flutter/widgets/pdf_viewer_screen.dart';
 import 'package:malltech_flutter/screens/correspondencia_detalhe.dart';
+import 'package:malltech_flutter/screens/novo_produto_screen.dart';
 
 String _textoLimpo(String html) {
   String texto;
@@ -704,11 +704,7 @@ class _GuiaScreenState extends State<GuiaScreen> {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const WebViewScreen(
-                  title: 'Novo produto',
-                  path:
-                      'https://v3.madnezz.com.br/systems/guia/?p=insert&integrated=true',
-                ),
+                builder: (_) => const NovoProdutoScreen(),
               ),
             ).then((_) => _recarregar()),
           ),
